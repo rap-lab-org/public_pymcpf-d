@@ -1,0 +1,4 @@
+build/mcpfd_sim/*.png
+output/*
+pytspbridge/tsp_solver/LKH-2.0.10/*
+/__pycache__/

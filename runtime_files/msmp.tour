@@ -1,0 +1,28 @@
+NAME : mcpfd.126.tour
+COMMENT : Length = 126
+COMMENT : Found by LKH [Keld Helsgaun] Tue Mar 19 17:57:22 2024
+TYPE : TOUR
+DIMENSION : 20
+TOUR_SECTION
+1
+17
+3
+18
+5
+12
+7
+6
+15
+16
+2
+13
+14
+10
+9
+11
+19
+4
+8
+20
+-1
+EOF
