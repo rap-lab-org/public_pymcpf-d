@@ -56,4 +56,4 @@ If the optimality of the solution must be guaranteed, one can consider leveragin
 [[Code](https://github.com/hang0610/public_pymcpf-d)]
 
 ## Contact
-If you have any questions, feel free to contact [me]([ht](https://hang0610.github.io/)).
+If you have any questions, feel free to contact [me](https://hang0610.github.io/).
