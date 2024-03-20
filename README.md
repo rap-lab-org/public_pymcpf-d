@@ -20,16 +20,12 @@ Please refer to the [video](https://sciencecast.org/casts/9oyjmr42cn8t).
 * [LKH-2.10.0](http://webhotel4.ruc.dk/~keld/research/LKH/) is required as the underlying TSP solver. The executable of LKH should be placed at location: pytspbridge/tsp_solver/LKH-2.10.0/LKH. In other words, run `pytspbridge/tsp_solver/LKH-2.10.0/LKH` command in the terminal should be able to invoke LKH.
 
 ## Instructions
-* ```python
+* Run:
+  ```python
   python3 run_cbss_mcpfd.py
   ```
   
   It may take a long time to finish running all the scens in the [dataset](https://movingai.com/benchmarks/mapf.html). You can adjust the params `N_list`, `M_list` and `duration_list` to decrease the workload.
-* ```python
-  python3 analytics.py
-  ```
-  
-  It can analyze the results obtained from running `run_cbss_mcpfd.py`. Be sure to align the `N_list`, `M_list` and `duration_list` with those in `run_cbss_mcpfd.py`.
 
 ## Notes
 Under `libmcpfd`, the code structure is as follows:
@@ -55,5 +51,10 @@ If the optimality of the solution must be guaranteed, one can consider leveragin
 [[Video](https://www.youtube.com/embed/sSX0HdzjmY4)]
 [[Code](https://github.com/hang0610/public_pymcpf-d)]
 
+[2] Ren, Zhongqiang, Sivakumar Rathinam, and Howie Choset. "CBSS: A New Approach for Multiagent Combinatorial Path Finding." IEEE Transaction on Robotics (T-RO), 2023.\
+[[Bibtex](https://wonderren.github.io/files/bibtex_ren23cbssTRO.txt)]
+[[Paper](https://wonderren.github.io/files/ren23_CBSS_TRO.pdf)]
+[[Talk](https://youtu.be/V17vQSZP5Zs?t=2853)]
+
 ## Contact
-If you have any questions, feel free to contact [me](https://hang0610.github.io/).
+If you have any questions, feel free to contact [Yuanhang Zhang](https://hang0610.github.io/).
