@@ -12,7 +12,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ## Demo
-Please refer to the [video](https://sciencecast.org/casts/9oyjmr42cn8t).
+Compare the two methods proposed in our work — CBSS-TPG and CBSS-D:
+
+![Demo](https://github.com/hang0610/public_pymcpf-d/blob/main/data/demo/output.gif)
 
 ## Requirements
 
