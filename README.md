@@ -1,4 +1,4 @@
-# Multi-Agent Combinatorial Path Finding with Task Duration (Under Construction)
+# Multi-Agent Combinatorial Path Finding with Task Duration
 
 This is the code repo for the paper [Multi-Agent Combinatorial Path Finding with Heterogeneous Task Duration](https://arxiv.org/abs/2311.15330).
 
