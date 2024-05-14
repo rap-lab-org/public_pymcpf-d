@@ -48,7 +48,7 @@ If the optimality of the solution must be guaranteed, one can consider leveragin
 
 ### Related Papers
 
-[1] Yuanhang Zhang, Hesheng Wang, and Zhongqiang Ren. "Multi-Agent Combinatorial Path Finding with Heterogeneous Task Duration." IEEE Transaction on Automation System and Engineering (T-ASE, under review), 2023.
+[1] Yuanhang Zhang, Hesheng Wang, and Zhongqiang Ren. "Multi-Agent Combinatorial Path Finding with Heterogeneous Task Duration." under review.
 [[arXiv](https://arxiv.org/abs/2311.15330)]
 [[Video](https://www.youtube.com/embed/sSX0HdzjmY4)]
 [[Code](https://github.com/hang0610/public_pymcpf-d)]
