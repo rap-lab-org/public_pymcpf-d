@@ -14,7 +14,11 @@ SOFTWARE.
 ## Demo
 Compare the two methods proposed in our work — CBSS-TPG and CBSS-D:
 
-![Demo](https://github.com/hang0610/public_pymcpf-d/blob/main/data/demo/output.gif)
+![Demo](https://github.com/hang0610/public_pymcpf-d/blob/main/data/demo/demo_1.gif)
+
+Deploy CBSS-D as the planner and TPG as the scheduler in Gazebo and Rviz:
+
+![Demo](https://github.com/hang0610/public_pymcpf-d/blob/main/data/demo/demo_2.gif)
 
 ## Requirements
 
