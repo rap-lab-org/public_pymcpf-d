@@ -423,6 +423,7 @@ class CbssDFramework:
           # one node one target_timeline
           if(nid not in self.target_timeline): self.target_timeline[nid] = copy.deepcopy(self.target_timeline[self.nodes[nid].parent])
           self.target_timeline[nid][gg] = [ri, lt[-1], lt[-1] + self.ac_dict[gg][ri]-1] # 'target': [start, end]
+          # add execution in the target
           for _ in range(self.ac_dict[gg][ri]-1):
             lv.append(lv[-1])
             lt.append(lt[-1]+1)

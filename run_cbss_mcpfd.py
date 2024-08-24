@@ -72,9 +72,9 @@ def run_CBSS_MSMP(case_name, map_file, scen_file, N = 5, M = 10, idx = 1, durati
   cbxs_baseline_dict = {}
   cbxs_old_res_dict = {}
   cbxs_res_dict = {}
-  if flag1: cbxs_baseline_dict = cbss_tpg_mcpfd.RunCbssMCPF(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], case_dict["ac_dict"], configs)
-  if flag2: cbxs_old_res_dict = cbss_d_old_mcpfd.RunCbssMCPF(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], case_dict["ac_dict"], configs)
-  if flag3: cbxs_res_dict = cbss_d_mcpfd.RunCbssMCPF(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], case_dict["ac_dict"], configs)
+  if flag1: cbxs_baseline_dict = cbss_tpg_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], case_dict["ac_dict"], configs)
+  if flag2: cbxs_old_res_dict = cbss_d_old_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], case_dict["ac_dict"], configs)
+  if flag3: cbxs_res_dict = cbss_d_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], case_dict["ac_dict"], configs)
   print(cbxs_baseline_dict)
   print(cbxs_old_res_dict)
   print(cbxs_res_dict)
@@ -82,9 +82,12 @@ def run_CBSS_MSMP(case_name, map_file, scen_file, N = 5, M = 10, idx = 1, durati
   ### simulate the path-sets of CBXS
   if sim:
     # print("### finals:", case_dict["finals"])
-    if flag1: cm.SimulatePathSet(grids, cbxs_baseline_dict['path_set'], case_dict["goals"], finals=case_dict['finals'])
-    if flag2: cm.SimulatePathSet(grids, cbxs_old_res_dict['path_set'], case_dict["goals"], finals=case_dict['finals'])
-    if flag3: cm.SimulatePathSet(grids, cbxs_res_dict['path_set'], case_dict["goals"], finals=case_dict['finals'])
+    if flag1: cm.SimulatePathSet(grids, cbxs_baseline_dict['path_set'], case_dict["goals"], finals=case_dict['finals'], 
+                                 ac_dict=case_dict["ac_dict"], target_timeline=cbxs_baseline_dict["target_timeline"])
+    if flag2: cm.SimulatePathSet(grids, cbxs_old_res_dict['path_set'], case_dict["goals"], finals=case_dict['finals'], 
+                                 ac_dict=case_dict["ac_dict"], target_timeline=cbxs_old_res_dict["traget_timeline"])
+    if flag3: cm.SimulatePathSet(grids, cbxs_res_dict['path_set'], case_dict["goals"], finals=case_dict['finals'], 
+                                 ac_dict=case_dict["ac_dict"], target_timeline=cbxs_res_dict["target_timeline"])
   
   ### save result data
   if SAVE_FLAG:
@@ -176,9 +179,12 @@ def run_CBSS_MCPFD(case_name, map_file, scen_file, N = 5, M = 10, idx = 1, durat
   ### simulate the path-sets of CBXS
   if sim:
     # print("### finals:", case_dict["finals"])
-    if flag1: cm.SimulatePathSet(grids, cbxs_baseline_dict['path_set'], case_dict["goals"], finals=case_dict['finals'])
-    if flag2: cm.SimulatePathSet(grids, cbxs_old_res_dict['path_set'], case_dict["goals"], finals=case_dict['finals'])
-    if flag3: cm.SimulatePathSet(grids, cbxs_res_dict['path_set'], case_dict["goals"], finals=case_dict['finals'])
+    if flag1: cm.SimulatePathSet(grids, cbxs_baseline_dict['path_set'], case_dict["goals"], finals=case_dict['finals'], 
+                                 ac_dict=case_dict["ac_dict"], target_timeline=cbxs_baseline_dict["target_timeline"])
+    if flag2: cm.SimulatePathSet(grids, cbxs_old_res_dict['path_set'], case_dict["goals"], finals=case_dict['finals'], 
+                                 ac_dict=case_dict["ac_dict"], target_timeline=cbxs_old_res_dict["traget_timeline"])
+    if flag3: cm.SimulatePathSet(grids, cbxs_res_dict['path_set'], case_dict["goals"], finals=case_dict['finals'], 
+                                 ac_dict=case_dict["ac_dict"], target_timeline=cbxs_res_dict["target_timeline"])
   
   ### save result data
   if SAVE_FLAG:
@@ -226,16 +232,16 @@ if __name__ == '__main__':
   map2_name = case2_name +".map"
   problem1 = 'msmp' 
   problem2 = 'mcpfd'
-  sim = False
-  N_list = [5,10,20]
-  M_list = [10,20,30,40,50]
-  duration_list = [2,5,10,20]
-  # N_list = [5]
-  # M_list = [10]
-  # duration_list = [2]
-  # RunExp(exp_name, case1_name, map1_name, problem1, N_list, M_list, duration_list, sim, True, True, True)
+  sim = True
+  # N_list = [5,10,20]
+  # M_list = [10,20,30,40,50]
+  # duration_list = [2,5,10,20]
+  N_list = [5]
+  M_list = [10]
+  duration_list = [2]
+  RunExp(exp_name, case1_name, map1_name, problem1, N_list, M_list, duration_list, sim, True, True, True)
   # RunExp(exp_name, case2_name, map2_name, problem1, N_list, M_list, duration_list, sim, True, True, True)
-  RunExp(exp_name, case1_name, map1_name, problem2, N_list, M_list, duration_list, sim, True, True, True)
+  # RunExp(exp_name, case1_name, map1_name, problem2, N_list, M_list, duration_list, sim, True, True, True)
   # RunExp(exp_name, case2_name, map2_name, problem2, N_list, M_list, duration_list, sim, True, True, True)
 
   print("end of main")

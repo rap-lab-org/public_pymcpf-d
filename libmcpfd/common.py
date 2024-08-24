@@ -511,7 +511,7 @@ def findTargetTimelineTPG(path_dict, path_dict_baseline, ac_dict, target_timelin
                         break
      return timeline_baseline
 
-def SimulatePathSet(grids, path_set, goals, jstate=[], finals=[], folder="build/mcpfd_sim/", ac_dict=dict(), target_timeline=dict(), prefix=""):
+def SimulatePathSet(grids, path_set, goals, jstate=[], finals=[], ac_dict=dict(), target_timeline=dict(), prefix="", folder="build/mcpfd_sim/"):
   """
   Simulate a path_set, which is a path dictionary
   path_set[robot_id][0=x_list][1=y_list]

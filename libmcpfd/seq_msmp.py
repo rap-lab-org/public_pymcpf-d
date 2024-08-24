@@ -91,7 +91,7 @@ class SeqMSMP(object):
     """
     solve the instance and return the results.
     """
-    tf_mat = tf_mtsp.tf_MDMTHPP(self.spMat, self.N, self.M, self.bigM, self.infM, self.ac_dict)
+    tf_mat = tf_mcpfd.tf_MDMTHPP(self.spMat, self.N, self.M, self.bigM, self.infM, self.ac_dict)
 
     if_atsp = True
     problem_str = "runtime_files/msmp"
@@ -99,11 +99,11 @@ class SeqMSMP(object):
       problem_str = self.configs["problem_str"]
     tsp_wrapper.gen_tsp_file(problem_str, tf_mat, if_atsp)
     res = tsp_wrapper.invoke_lkh(self.tsp_exe, problem_str)
-    mtsp_tours = tf_mtsp.tf_MDMTHPP_tours(res[0], self.N, self.M)
+    mtsp_tours = tf_mcpfd.tf_MDMTHPP_tours(res[0], self.N, self.M)
     seqs_dict = dict()
     for k in mtsp_tours:
       seqs_dict[k] = list()
       for node_idx in mtsp_tours[k]:
         seqs_dict[k].append(self.V[node_idx]) # from index to node ID.
-    mtsp_costs, total_cost = tf_mtsp.tf_MDMTHPP_costs(mtsp_tours, self.original_spMat, self.ac_dict) # use the original spMat
+    mtsp_costs, total_cost = tf_mcpfd.tf_MDMTHPP_costs(mtsp_tours, self.original_spMat, self.ac_dict) # use the original spMat
     return 1, res[2], seqs_dict, mtsp_costs
