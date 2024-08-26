@@ -13,7 +13,7 @@ import time
 class CbssTPGMCPFD(cbss_tpg.CbssTPGFramework) :
   """
   """
-  def __init__(self, grids, starts, goals, dests, ac_dict, configs):
+  def __init__(self, grids, starts, goals, dests, ac_dict, ag_dict, configs):
     """
     """
     ac_dict_mcpf = dict()
@@ -25,17 +25,17 @@ class CbssTPGMCPFD(cbss_tpg.CbssTPGFramework) :
         ac_dict_mcpf[tar].append(ag)
         ac_dict_mcpfd[tar][ag] = 1
     if configs["problem_str"]=='msmp':
-      mcpf_solver = seq_msmp.SeqMSMP(grids, starts, goals, dests, ac_dict_mcpf, configs)
-    else: mcpf_solver = seq_mcpf.SeqMCPF(grids, starts, goals, dests, ac_dict_mcpf, configs) # NOTE that ac_dict is only used in mcpfd_solver, not in CBSS itself.
-    super(CbssTPGMCPFD, self).__init__(mcpf_solver, grids, starts, goals, dests, ac_dict_mcpfd, configs)
+      mtsp_solver = seq_msmp.SeqMSMP(grids, starts, goals, dests, ac_dict_mcpfd, configs)
+    else: mtsp_solver = seq_mcpf.SeqMCPF(grids, starts, goals, dests, ac_dict_mcpfd, configs) # NOTE that ac_dict is only used in mtsp_solver, not in CBSS itself.
+    super(CbssTPGMCPFD, self).__init__(mtsp_solver, grids, starts, goals, dests, ac_dict_mcpfd, ag_dict, configs)
     return
 
-def RunCbssMCPFD(grids, starts, targets, dests, ac_dict, configs):
+def RunCbssMCPFD(grids, starts, targets, dests, ac_dict, ag_dict, configs):
   """
   starts, targets and dests are all node ID.
   heu_weight and prune_delta are not in use. @2021-05-26
   """
-  cbxs_planner = CbssTPGMCPFD(grids, starts, targets, dests, ac_dict, configs)
+  cbxs_planner = CbssTPGMCPFD(grids, starts, targets, dests, ac_dict, ag_dict, configs)
   path_set, search_res, cstr_set, sp_conf = cbxs_planner.Search()
   res_dict = dict()
   t0 = time.perf_counter()

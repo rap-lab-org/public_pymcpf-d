@@ -81,11 +81,11 @@ def run_CBSS_MSMP(case_name, map_file, scen_file, N = 5, M = 10, idx = 1, durati
   cbxs_old_res_dict = {}
   cbxs_res_dict = {}
   if flag1: cbxs_baseline_dict = cbss_tpg_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], 
-                                                             case_dict["ac_dict"], configs)
+                                                             case_dict["ac_dict"], case_dict["ag_dict"], configs)
   if flag2: cbxs_old_res_dict = cbss_d_old_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], 
-                                                              case_dict["ac_dict"], configs)
+                                                              case_dict["ac_dict"], case_dict["ag_dict"], configs)
   if flag3: cbxs_res_dict = cbss_d_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], 
-                                                      case_dict["ac_dict"], configs)
+                                                      case_dict["ac_dict"], case_dict["ag_dict"], configs)
   print(cbxs_baseline_dict)
   print(cbxs_old_res_dict)
   print(cbxs_res_dict)
@@ -192,9 +192,12 @@ def run_CBSS_MCPFD(case_name, map_file, scen_file, N = 5, M = 10, idx = 1, durat
   cbxs_baseline_dict = {}
   cbxs_old_res_dict = {}
   cbxs_res_dict = {}
-  if flag1: cbxs_baseline_dict = cbss_tpg_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], case_dict["ac_dict"], case_dict["ag_dict"], configs)
-  if flag2: cbxs_old_res_dict = cbss_d_old_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], case_dict["ac_dict"], case_dict["ag_dict"], configs)
-  if flag3: cbxs_res_dict = cbss_d_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], case_dict["ac_dict"], case_dict["ag_dict"], configs)
+  if flag1: cbxs_baseline_dict = cbss_tpg_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], 
+                                                             case_dict["ac_dict"], case_dict["ag_dict"], configs)
+  if flag2: cbxs_old_res_dict = cbss_d_old_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], 
+                                                              case_dict["ac_dict"], case_dict["ag_dict"], configs)
+  if flag3: cbxs_res_dict = cbss_d_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], 
+                                                      case_dict["ac_dict"], case_dict["ag_dict"], configs)
   print(cbxs_baseline_dict)
   print(cbxs_old_res_dict)
   print(cbxs_res_dict)
@@ -258,7 +261,7 @@ if __name__ == '__main__':
   map2_name = case2_name +".map"
   problem1 = 'msmp' 
   problem2 = 'mcpfd'
-  sim = True
+  sim = False
   # N_list = [5,10,20]
   # M_list = [10,20,30,40,50]
   # duration_list = [2,5,10,20]

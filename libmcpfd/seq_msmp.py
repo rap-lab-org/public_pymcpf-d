@@ -91,6 +91,7 @@ class SeqMSMP(object):
     """
     solve the instance and return the results.
     """
+    print("self.ac_dict: ", self.ac_dict)
     tf_mat = tf_mtsp.tf_MDMTHPP(self.spMat, self.N, self.M, self.bigM, self.infM, self.ac_dict)
 
     if_atsp = True

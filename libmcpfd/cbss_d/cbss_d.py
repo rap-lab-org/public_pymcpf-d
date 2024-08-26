@@ -6,7 +6,7 @@ Oeffentlich fuer: RSS22
 """
 
 import kbtsp as kb
-import libmcpfd.cbss_lowlevel as sipp
+import libmcpfd.cbss_lowlevel as sipp_ml
 import common as cm
 import copy
 import time
@@ -68,17 +68,19 @@ class CbsSol:
   def __str__(self):
     return str(self.paths)
 
-  def AddPath(self, i, lv, lt):
+  def AddPath(self, i, lv, lt, lo=[]):
     """
     lv is a list of loc id
     lt is a list of time
     """
     nlv = lv
     nlt = lt
+    nlo = lo
     # add a final infinity interval
     nlv.append(lv[-1])
     nlt.append(np.inf)
-    self.paths[i] = [nlv,nlt]
+    nlo.append(lo[-1])
+    self.paths[i] = [nlv,nlt,nlo]
     return 
 
   def DelPath(self, i):
@@ -105,6 +107,11 @@ class CbsSol:
         ivb = self.paths[i][0][ix+1]
         jva = self.paths[j][0][jx]
         jvb = self.paths[j][0][jx+1]
+        # TODO: deal with occupylist
+        ioa = self.paths[i][2][ix]
+        iob = self.paths[i][2][ix + 1]
+        joa = self.paths[j][2][jx]
+        job = self.paths[j][2][jx + 1]
         overlaps, t_lb, t_ub = cm.ItvOverlap(ita,itb,jta,jtb)
         if not overlaps:
           continue
@@ -149,7 +156,7 @@ class CbsSol:
           return {'type':2, 'i':i, 'j':j, 'iva':iva, 'jva':jva, 't_lb':t_lb},[[CbsConstraint(i, iva, ivb, t_lb, t_lb+1, j, 2)], [CbsConstraint(j, jva, jvb, t_lb, t_lb+1, i, 2)]], False
       ix = ix + 1
     return {}, [], False
-
+  
   def ComputeCost(self, flag=DEBUG_CBXS):
     """
     """
@@ -185,7 +192,7 @@ class CbssDNode:
     return
 
   def __str__(self):
-    str1 = "{id:"+str(self.id)+",c:"+str(self.cost)+",par:"+str(self.parent)
+    str1 = "{id:"+str(self.id)+",cost:"+str(self.cost)+",parent:"+str(self.parent)
     return str1+",cstr:"+str(self.cstr)+",sol:"+str(self.sol)+"}"
 
   def CheckConflict(self, ac_dict, target_timeline):
@@ -219,7 +226,7 @@ class CbssDNode:
 class CbssDFramework:
   """
   """
-  def __init__(self, mtsp_solver, grids, starts, goals, dests, ac_dict, configs):
+  def __init__(self, mtsp_solver, grids, starts, goals, dests, ac_dict, ag_dict, configs):
     """
     grids is 2d static grids.
     """
@@ -232,6 +239,7 @@ class CbssDFramework:
     self.total_num = len(starts) + len(dests) + len(goals)
     # print("### init ac_dict:", ac_dict)
     self.ac_dict = ac_dict
+    self.ag_dict = ag_dict
     self.num_robots = len(starts)
     self.eps = configs["eps"]
     self.configs = configs
@@ -302,7 +310,7 @@ class CbssDFramework:
       if not self.next_seq: # next_seq not computed yet, compute next seq
         tlimit = self.time_limit - (time.perf_counter() - self.tstart)
         flag = self.kbtsp.ComputeNextBest(tlimit, self.total_num)
-        if not flag: # no joint sequence any more.
+        if not flag: # no joint sequence anymore.
           self.next_seq = None
         else:
           self.next_seq = self.kbtsp.GetKthBestSol() # will be used to check if new root needs to be generated.
@@ -361,17 +369,22 @@ class CbssDFramework:
     else: # during search
       self.root_seq_dict[nid] = self.next_seq
       self.next_seq = None # next_seq has been used, make it empty.
+    
     ### init target_timeline
     self.target_timeline[nid]={}
+    
     ### plan path based on goal sequence for all agents ###
     if DEBUG_CBXS:
       print("### self.root_seq_dict[nid] is:", self.root_seq_dict[nid])
       print("### cstr", self.nodes[nid].cstr)
     for ri in range(self.num_robots): # loop over agents, plan their paths
-      lv, lt, stats = self.Lsearch(nid, ri)
+      # Sequential A* (note: may not be optimal)
+      # lv, lt, stats = self.Lsearch(nid, ri)
+      # Multi-label A* (always optimal)
+      lv, lt, lo, stats = self.Lsearch_ml(nid, ri)
       if len(lv) == 0: # fail to init, time out or sth.
         return False
-      self.nodes[nid].sol.AddPath(ri,lv,lt)
+      self.nodes[nid].sol.AddPath(ri,lv,lt,lo)
 
     ### update cost and insert into OPEN ###
     c = self.nodes[nid].ComputeCost() # update node cost and return cost value
@@ -383,7 +396,7 @@ class CbssDFramework:
 
   def Lsearch(self, nid, ri):
     """
-    input a high level node, ri is optional(why optional?).
+    input a high level node, ri is optional (why optional?).
     """
     if DEBUG_CBXS:
       print("Lsearch, nid:",nid)
@@ -400,11 +413,17 @@ class CbssDFramework:
     all_lv.append(self.starts[ri])
     all_lt = []
     all_lt.append(0)
+    all_lo = []
+    all_lo.append([self.starts[ri]])
     success = True
+    # copy the target timeline from parent node
+    if(nid not in self.target_timeline):
+      self.target_timeline[nid] = copy.deepcopy(self.target_timeline[self.nodes[nid].parent])
+    
     for kth in range(1, len(gseq)):
       # TODO, this can be optimized, 
       # no need to plan path between every pair of waypoints each time! Impl detail.
-      # TODO: for CBXS, low-level search need to be modified on the special targets(repeat)
+      # TODO (done): for CBXS, low-level search need to be modified on the special targets(repeat)
       gg = gseq[kth]
       ignore_goal_cstr = True
       if kth == len(gseq)-1: # last goal
@@ -421,7 +440,6 @@ class CbssDFramework:
         # check for the need to modify the path for the target with tasks
         if(gg in self.ac_dict and ri in self.ac_dict[gg] and self.ac_dict[gg][ri]>=1):
           # one node one target_timeline
-          if(nid not in self.target_timeline): self.target_timeline[nid] = copy.deepcopy(self.target_timeline[self.nodes[nid].parent])
           self.target_timeline[nid][gg] = [ri, lt[-1], lt[-1] + self.ac_dict[gg][ri]-1] # 'target': [start, end]
           # add execution in the target
           for _ in range(self.ac_dict[gg][ri]-1):
@@ -438,7 +456,7 @@ class CbssDFramework:
       return [], [], success
     else:
       return all_lv, all_lt, success
-
+    
   def LsearchP2P(self, nid, ri, ss, gg, t0, ignore_goal_cstr, task_duration):
     """
     Do low level search for agent-i from vertex ss with starting time step t0
@@ -462,6 +480,64 @@ class CbssDFramework:
       return [],[],sipp_stats
     else:
       return res_path[0], res_path[1], sipp_stats
+    
+  def Lsearch_ml(self, nid, ri):
+    """
+    input a high level node, ri is optional(why optional?).
+    """
+    if DEBUG_CBXS:
+      print("Lsearch, nid:",nid)
+    nd = self.nodes[nid]
+    root_num = self.nodes[nid].root_num
+    tlimit = self.time_limit - (time.perf_counter() - self.tstart)
+
+    # plan from start to assigned goals and to dest as specified in goal sequence
+    gseq = self.root_seq_dict[self.nodes[nid].root_id].sol[ri]
+    ss = gseq[0]
+    kth = 1
+    t0 = 0
+    all_lv = []
+    all_lv.append(self.starts[ri])
+    all_lt = []
+    all_lt.append(0)
+    all_lo = []
+    all_lo.append([self.starts[ri]])
+    success = True
+    ignore_goal_cstr = False # ask robot can stay destination forever
+    nd = self.nodes[nid]
+    if ri < 0:  # to support init search.
+      ri = nd.cstr.i
+    tlimit = self.time_limit - (time.perf_counter() - self.tstart)
+    ncs, ecs = self.BacktrackCstrs(nid, ri)
+    
+    if(nid not in self.target_timeline): self.target_timeline[nid] = copy.deepcopy(self.target_timeline[self.nodes[nid].parent])
+    res_path, sipp_stats, self.target_timeline[nid] = sipp_ml.RunSipp_ml(self.grids, gseq, t0, ignore_goal_cstr, 3.0, 0.0, 
+                                                                         tlimit, ncs, ecs, self.ag_dict[ri], self.target_timeline[nid], ri) # note the t0 here!
+    
+    if DEBUG_CBXS:
+      if len(res_path) != 0:
+        invalidtag = 0
+        for iv in range(len(res_path[2])):
+          for incs in ncs:
+            if incs[0] in res_path[2][iv] and incs[1] == res_path[1][iv]:
+              print(" no satisfy constraints",incs)
+              invalidtag = 1
+          if invalidtag==1:
+            break
+        if invalidtag==0:
+          print("satisfy constraints")
+        else:
+          print(" no satisfy constraints")
+          return [], [], False
+    
+    if len(res_path) == 0:  # failed
+      success = False
+      return [], [], success
+    else:  # good
+      self.UpdateStats(sipp_stats)
+      # Concatenate the path
+      all_lv, all_lt, all_lo = self.ConcatePath_ml(all_lv, all_lt, all_lo, res_path[0], res_path[1], res_path[2])
+      return all_lv, all_lt, all_lo, success   
   
   def ConcatePath(self, all_lv, all_lt, lv, lt):
     """
@@ -472,6 +548,15 @@ class CbssDFramework:
       sys.exit("[ERROR] ConcatePath, time step mismatch !")
     return all_lv + lv[1:], all_lt + lt[1:]
 
+  def ConcatePath_ml(self, all_lv, all_lt, all_lo, lv, lt, lo):
+    """
+    remove the first node in lv,lt and then concate with all_xx.
+    """
+    if (len(all_lt) > 0) and (lt[0] != all_lt[-1]):
+      print("[ERROR] ConcatePath lv = ", lv, " lt = ", lt, " all_lv = ", all_lv, " all_lt = ", all_lt)
+      sys.exit("[ERROR] ConcatePath, time step mismatch !")
+    return all_lv + lv[1:], all_lt + lt[1:], all_lo + lo[1:]
+  
   def FirstConflict(self, nd):
     return nd.CheckConflict(self.ac_dict, self.target_timeline[nd.id])
 
@@ -607,7 +692,10 @@ class CbssDFramework:
         ri = cstr[0].i
       
         ### replan paths for the agent, subject to new constraint ###
-        lv,lt,flag = self.Lsearch(new_id, ri)
+        # Sequential A* (note: may not be optimal)
+        # lv, lt, stats = self.Lsearch(new_id, ri)
+        # Multi-label A* (always optimal)
+        lv, lt, lo, stats = self.Lsearch_ml(new_id, ri)
         self.num_low_level_calls = self.num_low_level_calls + 1 
         if len(lv)==0:
           # this branch fails, robot ri cannot find a consistent path.
@@ -617,7 +705,8 @@ class CbssDFramework:
           resolve_flag = True
 
         self.nodes[new_id].sol.DelPath(ri)
-        self.nodes[new_id].sol.AddPath(ri,lv,lt)
+        self.nodes[new_id].sol.AddPath(ri,lv,lt,lo)
+        
         nn_cost = self.nodes[new_id].ComputeCost()
         if DEBUG_CBXS:
           print("### CBXS add node ", self.nodes[new_id], " into OPEN,,, nn_cost = ", nn_cost, ", nid = ", new_id)

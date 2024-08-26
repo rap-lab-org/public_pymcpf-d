@@ -12,7 +12,7 @@ import libmcpfd.seq_mcpfd as seq_mcpfd
 class CbssDMCPFD(cbss_d.CbssDFramework) :
   """
   """
-  def __init__(self, grids, starts, goals, dests, ac_dict, configs):
+  def __init__(self, grids, starts, goals, dests, ac_dict, ag_dict, configs):
     """
     """
     # mtsp_solver = msmp_seq.BridgeLKH_MSMP(grids, starts, goals, dests)
@@ -20,15 +20,15 @@ class CbssDMCPFD(cbss_d.CbssDFramework) :
     if configs["problem_str"]=='msmp':
       mtsp_solver = seq_msmp.SeqMSMP(grids, starts, goals, dests, ac_dict, configs)
     else: mtsp_solver = seq_mcpfd.SeqMCPFD(grids, starts, goals, dests, ac_dict, configs) # NOTE that ac_dict is only used in mtsp_solver, not in CBSS itself.
-    super(CbssDMCPFD, self).__init__(mtsp_solver, grids, starts, goals, dests, ac_dict, configs)
+    super(CbssDMCPFD, self).__init__(mtsp_solver, grids, starts, goals, dests, ac_dict, ag_dict, configs)
     return
 
-def RunCbssMCPFD(grids, starts, targets, dests, ac_dict, configs):
+def RunCbssMCPFD(grids, starts, targets, dests, ac_dict, ag_dict, configs):
   """
   starts, targets and dests are all node ID.
   heu_weight and prune_delta are not in use. @2021-05-26
   """
-  cbxs_planner = CbssDMCPFD(grids, starts, targets, dests, ac_dict, configs)
+  cbxs_planner = CbssDMCPFD(grids, starts, targets, dests, ac_dict, ag_dict, configs)
   path_set, search_res, cstr_set, sp_conf= cbxs_planner.Search()
   # print(path_set)
   # print(res_dict)
