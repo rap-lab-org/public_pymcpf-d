@@ -43,6 +43,9 @@ The rest python scripts are the basic components supporting the codes above.
 
 ## Others
 
+### About the Low-Level Search
+The original implementation has a flaw in its low-level search, which runs sequential A* and ignores the influence across targets. As a result, it may not return an optimal individual path. The latest version (tag: v1.1 and thereafter) has fixes this issue on the low-level search.
+
 ### About Solution Optimality
 
 CBSS is theoretically guaranteed to find an optimal or bounded sub-optimal solution joint path, when the underlying TSP solver is guaranteed to solve TSPs to optimality.
