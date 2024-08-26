@@ -39,15 +39,23 @@ def run_CBSS_MSMP(case_name, map_file, scen_file, N = 5, M = 10, idx = 1, durati
   dests = [dests_all[y] for y in sf_index]
   targets = random.sample(targets_all, M)
   ac_dict = dict()
+  ag_dict = dict()
   for k in targets:
     ac_dict[k] = {ri % len(starts): duration for ri in range(N)}
+    for ri in range(N):
+      if ri % len(starts) not in ag_dict: ag_dict[ri % len(starts)] = dict()
+      ag_dict[ri % len(starts)].update({k: duration})
   for k in dests:
     ac_dict[k] = {ri: 1 for ri in range(N)}
+    for ri in range(N):
+      if ri not in ag_dict: ag_dict[ri] = dict()
+      ag_dict[ri].update({k: 1})
 
   case_dict["starts"] = starts
   case_dict["goals"] = targets
   case_dict["finals"] = dests
   case_dict["ac_dict"] = ac_dict
+  case_dict["ag_dict"] = ag_dict
 
   ### debug case load
   if DEBUG_CASE:
@@ -72,9 +80,12 @@ def run_CBSS_MSMP(case_name, map_file, scen_file, N = 5, M = 10, idx = 1, durati
   cbxs_baseline_dict = {}
   cbxs_old_res_dict = {}
   cbxs_res_dict = {}
-  if flag1: cbxs_baseline_dict = cbss_tpg_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], case_dict["ac_dict"], configs)
-  if flag2: cbxs_old_res_dict = cbss_d_old_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], case_dict["ac_dict"], configs)
-  if flag3: cbxs_res_dict = cbss_d_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], case_dict["ac_dict"], configs)
+  if flag1: cbxs_baseline_dict = cbss_tpg_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], 
+                                                             case_dict["ac_dict"], configs)
+  if flag2: cbxs_old_res_dict = cbss_d_old_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], 
+                                                              case_dict["ac_dict"], configs)
+  if flag3: cbxs_res_dict = cbss_d_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], 
+                                                      case_dict["ac_dict"], configs)
   print(cbxs_baseline_dict)
   print(cbxs_old_res_dict)
   print(cbxs_res_dict)
@@ -85,20 +96,24 @@ def run_CBSS_MSMP(case_name, map_file, scen_file, N = 5, M = 10, idx = 1, durati
     if flag1: cm.SimulatePathSet(grids, cbxs_baseline_dict['path_set'], case_dict["goals"], finals=case_dict['finals'], 
                                  ac_dict=case_dict["ac_dict"], target_timeline=cbxs_baseline_dict["target_timeline"])
     if flag2: cm.SimulatePathSet(grids, cbxs_old_res_dict['path_set'], case_dict["goals"], finals=case_dict['finals'], 
-                                 ac_dict=case_dict["ac_dict"], target_timeline=cbxs_old_res_dict["traget_timeline"])
+                                 ac_dict=case_dict["ac_dict"], target_timeline=cbxs_old_res_dict["target_timeline"])
     if flag3: cm.SimulatePathSet(grids, cbxs_res_dict['path_set'], case_dict["goals"], finals=case_dict['finals'], 
                                  ac_dict=case_dict["ac_dict"], target_timeline=cbxs_res_dict["target_timeline"])
   
   ### save result data
   if SAVE_FLAG:
     result = dict()
-    result['cbxs_baseline_dict'] = cbxs_baseline_dict
-    result['cbxs_old_res_dict'] = cbxs_old_res_dict
-    result['cbxs_res_dict'] = cbxs_res_dict
-    result['n_conf'] = cbxs_res_dict["n_conf"]
-    result['n_conf_old'] = cbxs_old_res_dict["n_conf"]
-    result['n_sp_conf'] = cbxs_res_dict["n_sp_conf"]
-    result['n_sp_conf_old'] = cbxs_old_res_dict["n_sp_conf"]
+    if flag1:
+      result['cbxs_baseline_dict'] = cbxs_baseline_dict
+    if flag2:
+      result['cbxs_old_res_dict'] = cbxs_old_res_dict
+      result['n_conf_old'] = cbxs_old_res_dict["n_conf"]
+      result['n_sp_conf_old'] = cbxs_old_res_dict["n_sp_conf"]
+    if flag3:
+      result['cbxs_res_dict'] = cbxs_res_dict
+      result['n_conf'] = cbxs_res_dict["n_conf"]
+      result['n_sp_conf'] = cbxs_res_dict["n_sp_conf"]
+      
     with open(result_path, 'wb') as f:
       pickle.dump(result, f)
 
@@ -132,19 +147,27 @@ def run_CBSS_MCPFD(case_name, map_file, scen_file, N = 5, M = 10, idx = 1, durat
   dests = [dests_all[y] for y in sf_index]
   targets = random.sample(targets_all, M)
   ac_dict = dict()
+  ag_dict = dict()
   ri = 0
   for k in targets:
     ac_dict[k] = {ri % len(starts): duration,(ri+1)%len(starts): duration}
+    if ri % len(starts) not in ag_dict: ag_dict[ri % len(starts)] = dict()
+    if (ri+1)%len(starts) not in ag_dict: ag_dict[(ri+1)%len(starts)] = dict()
+    ag_dict[ri % len(starts)].update({k: duration})
+    ag_dict[(ri+1)%len(starts)].update({k: duration})
     ri += 1
   ri = 0
   for k in dests:
     ac_dict[k] = {ri: 1}
+    if ri not in ag_dict: ag_dict[ri] = dict()
+    ag_dict[ri].update({k: 1})
     ri += 1
 
   case_dict["starts"] = starts
   case_dict["goals"] = targets
   case_dict["finals"] = dests
   case_dict["ac_dict"] = ac_dict
+  case_dict["ag_dict"] = ag_dict
 
   ### debug case load
   if DEBUG_CASE:
@@ -169,9 +192,9 @@ def run_CBSS_MCPFD(case_name, map_file, scen_file, N = 5, M = 10, idx = 1, durat
   cbxs_baseline_dict = {}
   cbxs_old_res_dict = {}
   cbxs_res_dict = {}
-  if flag1: cbxs_baseline_dict = cbss_tpg_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], case_dict["ac_dict"], configs)
-  if flag2: cbxs_old_res_dict = cbss_d_old_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], case_dict["ac_dict"], configs)
-  if flag3: cbxs_res_dict = cbss_d_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], case_dict["ac_dict"], configs)
+  if flag1: cbxs_baseline_dict = cbss_tpg_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], case_dict["ac_dict"], case_dict["ag_dict"], configs)
+  if flag2: cbxs_old_res_dict = cbss_d_old_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], case_dict["ac_dict"], case_dict["ag_dict"], configs)
+  if flag3: cbxs_res_dict = cbss_d_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], case_dict["ac_dict"], case_dict["ag_dict"], configs)
   print(cbxs_baseline_dict)
   print(cbxs_old_res_dict)
   print(cbxs_res_dict)
@@ -182,20 +205,23 @@ def run_CBSS_MCPFD(case_name, map_file, scen_file, N = 5, M = 10, idx = 1, durat
     if flag1: cm.SimulatePathSet(grids, cbxs_baseline_dict['path_set'], case_dict["goals"], finals=case_dict['finals'], 
                                  ac_dict=case_dict["ac_dict"], target_timeline=cbxs_baseline_dict["target_timeline"])
     if flag2: cm.SimulatePathSet(grids, cbxs_old_res_dict['path_set'], case_dict["goals"], finals=case_dict['finals'], 
-                                 ac_dict=case_dict["ac_dict"], target_timeline=cbxs_old_res_dict["traget_timeline"])
+                                 ac_dict=case_dict["ac_dict"], target_timeline=cbxs_old_res_dict["target_timeline"])
     if flag3: cm.SimulatePathSet(grids, cbxs_res_dict['path_set'], case_dict["goals"], finals=case_dict['finals'], 
                                  ac_dict=case_dict["ac_dict"], target_timeline=cbxs_res_dict["target_timeline"])
   
   ### save result data
   if SAVE_FLAG:
     result = dict()
-    result['cbxs_baseline_dict'] = cbxs_baseline_dict
-    result['cbxs_old_res_dict'] = cbxs_old_res_dict
-    result['cbxs_res_dict'] = cbxs_res_dict
-    result['n_conf'] = cbxs_res_dict["n_conf"]
-    result['n_conf_old'] = cbxs_old_res_dict["n_conf"]
-    result['n_sp_conf'] = cbxs_res_dict["n_sp_conf"]
-    result['n_sp_conf_old'] = cbxs_old_res_dict["n_sp_conf"]
+    if flag1:
+      result['cbxs_baseline_dict'] = cbxs_baseline_dict
+    if flag2:
+      result['cbxs_old_res_dict'] = cbxs_old_res_dict
+      result['n_conf_old'] = cbxs_old_res_dict["n_conf"]
+      result['n_sp_conf_old'] = cbxs_old_res_dict["n_sp_conf"]
+    if flag3:
+      result['cbxs_res_dict'] = cbxs_res_dict
+      result['n_conf'] = cbxs_res_dict["n_conf"]
+      result['n_sp_conf'] = cbxs_res_dict["n_sp_conf"]
     with open(result_path, 'wb') as f:
       pickle.dump(result, f)
 

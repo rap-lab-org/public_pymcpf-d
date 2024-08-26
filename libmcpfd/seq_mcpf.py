@@ -13,7 +13,7 @@ sys.path.append(os.path.abspath('../')) # to import context
 
 import context
 import tsp_wrapper
-import tf_mcpfd
+import tf_mtsp
 import common as cm
 
 DEBUG_SEQ_MCPF = 0

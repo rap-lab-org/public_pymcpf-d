@@ -13,7 +13,7 @@ sys.path.append(os.path.abspath('../')) # to import context
 
 import context
 import tsp_wrapper
-import tf_mcpfd
+import tf_mtsp
 import common as cm
 
 DEBUG_SEQ_MCPFD = 0
@@ -294,7 +294,7 @@ class SeqMCPFD():
     # 
 
     if_atsp = True
-    problem_str = "runtime_files/mcpf"
+    problem_str = "runtime_files/mcpfd"
     if problem_str in self.configs:
       problem_str = self.configs["problem_str"]
     tsp_wrapper.gen_tsp_file(problem_str, self.cost_mat, if_atsp)
