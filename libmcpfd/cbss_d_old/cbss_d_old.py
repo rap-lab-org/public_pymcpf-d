@@ -490,7 +490,7 @@ class CbssDFramework:
     ncs, ecs = self.BacktrackCstrs(nid, ri)
     
     if(nid not in self.target_timeline): self.target_timeline[nid] = copy.deepcopy(self.target_timeline[self.nodes[nid].parent])
-    res_path, sipp_stats, self.target_timeline[nid] = sipp_ml.RunSipp_ml(self.grids, gseq, t0, ignore_goal_cstr, 3.0, 0.0, 
+    res_path, sipp_stats, self.target_timeline[nid] = sipp_ml.RunSipp_ml(self.grids, gseq, t0, ignore_goal_cstr, 1.0, 0.0, 
                                                                          tlimit, ncs, ecs, self.ag_dict[ri], self.target_timeline[nid], ri) # note the t0 here!
     
     if DEBUG_CBXS:
