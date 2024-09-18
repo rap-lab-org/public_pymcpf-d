@@ -210,7 +210,7 @@ class SippGridSpace:
     """
     out = list()
     tlist = self.GetSuccSafeItv_ml(u,v,tlb,tub)
-    print("tlist = ", tlist)
+    # print("tlist = ", tlist)
     for itv in tlist:
       itv0, success = self.LookUpItv(v, itv[0])
       if not success:
@@ -305,7 +305,7 @@ class SIPP:
     hdistance = 0
     #tasktime = 1 # should be updated
     for i in self.gseq[1+s.carttag:]:
-      print("self.ag_dict_ri: ", self.ag_dict_ri)
+      # print("self.ag_dict_ri: ", self.ag_dict_ri)
       tasktime = self.ag_dict_ri[i] - 1 # current task time
       iy = int(np.floor(i/self.nxt))
       ix = int(i%self.nxt)
