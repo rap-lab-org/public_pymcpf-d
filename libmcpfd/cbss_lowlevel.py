@@ -467,7 +467,7 @@ class SIPP:
       tt.append(self.all_visited_s[sid].t)
       # Update target_timeline_nid
       if self.all_visited_s[sid].task_execution:
-        print("self.all_visited_s[sid]: ", self.all_visited_s[sid])
+        # print("self.all_visited_s[sid]: ", self.all_visited_s[sid])
         self.target_timeline_nid[self.all_visited_s[sid].loc] = [self.ri, 
                                                                  self.all_visited_s[sid].t - (self.ag_dict_ri[self.all_visited_s[sid].loc] - 1), 
                                                                  self.all_visited_s[sid].t]
