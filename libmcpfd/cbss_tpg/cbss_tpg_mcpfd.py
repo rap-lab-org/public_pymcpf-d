@@ -9,25 +9,26 @@ import libmcpfd.cbss_tpg.cbss_tpg as cbss_tpg
 import libmcpfd.seq_msmp as seq_msmp
 import libmcpfd.seq_mcpf as seq_mcpf
 import time
-
+  
 class CbssTPGMCPFD(cbss_tpg.CbssTPGFramework) :
   """
   """
   def __init__(self, grids, starts, goals, dests, ac_dict, ag_dict, configs):
     """
     """
-    ac_dict_mcpf = dict()
-    ac_dict_mcpfd = dict()
+    ac_dict_tpg = dict()
+    ag_dict_tpg = dict()
     for tar in ac_dict:
-      ac_dict_mcpf[tar] = list()
-      ac_dict_mcpfd[tar] = dict()
+      ac_dict_tpg[tar] = dict()
       for ag in ac_dict[tar]:
-        ac_dict_mcpf[tar].append(ag)
-        ac_dict_mcpfd[tar][ag] = 1
+        ac_dict_tpg[tar][ag] = 1
+        if ag not in ag_dict_tpg:
+          ag_dict_tpg[ag] = dict()
+        ag_dict_tpg[ag].update({tar: 1})
     if configs["problem_str"]=='msmp':
-      mtsp_solver = seq_msmp.SeqMSMP(grids, starts, goals, dests, ac_dict_mcpfd, configs)
-    else: mtsp_solver = seq_mcpf.SeqMCPF(grids, starts, goals, dests, ac_dict_mcpfd, configs) # NOTE that ac_dict is only used in mtsp_solver, not in CBSS itself.
-    super(CbssTPGMCPFD, self).__init__(mtsp_solver, grids, starts, goals, dests, ac_dict_mcpfd, ag_dict, configs)
+      mtsp_solver = seq_msmp.SeqMSMP(grids, starts, goals, dests, ac_dict_tpg, configs)
+    else: mtsp_solver = seq_mcpf.SeqMCPF(grids, starts, goals, dests, ac_dict_tpg, configs) # NOTE that ac_dict is only used in mtsp_solver, not in CBSS itself.
+    super(CbssTPGMCPFD, self).__init__(mtsp_solver, grids, starts, goals, dests, ac_dict_tpg, ag_dict_tpg, configs)
     return
 
 def RunCbssMCPFD(grids, starts, targets, dests, ac_dict, ag_dict, configs):
