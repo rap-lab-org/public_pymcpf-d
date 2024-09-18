@@ -27,7 +27,22 @@ def run_CBSS_MSMP(case_name, map_file, scen_file, N = 5, M = 10, idx = 1, durati
   print(output_dir)
   case_path = os.path.join(output_dir, 'case'+str(idx)+'.pickle')
   result_path = os.path.join(output_dir, 'result'+str(idx)+'.pickle')
-  if os.path.exists(result_path) and not DEBUG_CASE: return {}, {}, {}
+  if os.path.exists(result_path): 
+    print("Result exists")
+    case_pickle = open(case_path,'rb')
+    case_dict = pickle.load(case_pickle)
+    result_pickle = open(result_path,'rb')
+    result_dict = pickle.load(result_pickle)
+    ### simulate the path-sets of CBXS
+    if sim:
+      # print("### finals:", case_dict["finals"])
+      if flag1: cm.SimulatePathSet(case_dict["grids"], result_dict['cbxs_baseline_dict']['path_set'], case_dict["goals"], finals=case_dict['finals'], 
+                                  ac_dict=case_dict["ac_dict"], target_timeline=result_dict['cbxs_baseline_dict']["target_timeline"])
+      if flag2: cm.SimulatePathSet(case_dict["grids"], result_dict['cbxs_old_res_dict']['path_set'], case_dict["goals"], finals=case_dict['finals'], 
+                                  ac_dict=case_dict["ac_dict"], target_timeline=result_dict['cbxs_old_res_dict']["target_timeline"])
+      if flag3: cm.SimulatePathSet(case_dict["grids"], result_dict['cbxs_res_dict']['path_set'], case_dict["goals"], finals=case_dict['finals'], 
+                                  ac_dict=case_dict["ac_dict"], target_timeline=result_dict['cbxs_res_dict']["target_timeline"])
+    return {}, {}, {}
   ### processing benchmark data
   grids = case_dict["grids"]
   starts_all = case_dict["starts"]
@@ -133,7 +148,24 @@ def run_CBSS_MCPFD(case_name, map_file, scen_file, N = 5, M = 10, idx = 1, durat
   print(output_dir)
   case_path = os.path.join(output_dir, 'case'+str(idx)+'.pickle')
   result_path = os.path.join(output_dir, 'result'+str(idx)+'.pickle')
-  if os.path.exists(result_path) and not DEBUG_CASE: return {}, {}, {}
+  if os.path.exists(result_path) and not DEBUG_CASE: 
+    case_pickle = open(case_path,'rb')
+    case_dict = pickle.load(case_pickle)
+    result_pickle = open(result_path,'rb')
+    result_dict = pickle.load(result_pickle)
+    # print("baseline['path_set']: ", result_dict['cbxs_baseline_dict']['target_timeline'])
+    # print("old_res['path_set']: ", result_dict['cbxs_old_res_dict']['target_timeline'])
+    # print("res['path_set']: ", result_dict['cbxs_res_dict']['target_timeline'])
+    ### simulate the path-sets of CBXS
+    if sim:
+      # print("### finals:", case_dict["finals"])
+      if flag1: cm.SimulatePathSet(case_dict["grids"], result_dict['cbxs_baseline_dict']['path_set'], case_dict["goals"], finals=case_dict['finals'], 
+                                  ac_dict=case_dict["ac_dict"], target_timeline=result_dict['cbxs_baseline_dict']["target_timeline"])
+      if flag2: cm.SimulatePathSet(case_dict["grids"], result_dict['cbxs_old_res_dict']['path_set'], case_dict["goals"], finals=case_dict['finals'], 
+                                  ac_dict=case_dict["ac_dict"], target_timeline=result_dict['cbxs_old_res_dict']["target_timeline"])
+      if flag3: cm.SimulatePathSet(case_dict["grids"], result_dict['cbxs_res_dict']['path_set'], case_dict["goals"], finals=case_dict['finals'], 
+                                  ac_dict=case_dict["ac_dict"], target_timeline=result_dict['cbxs_res_dict']["target_timeline"])
+    return {}, {}, {}
   ### processing benchmark data
   grids = case_dict["grids"]
   starts_all = case_dict["starts"]
@@ -192,15 +224,18 @@ def run_CBSS_MCPFD(case_name, map_file, scen_file, N = 5, M = 10, idx = 1, durat
   cbxs_baseline_dict = {}
   cbxs_old_res_dict = {}
   cbxs_res_dict = {}
-  if flag1: cbxs_baseline_dict = cbss_tpg_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], 
-                                                             case_dict["ac_dict"], case_dict["ag_dict"], configs)
-  if flag2: cbxs_old_res_dict = cbss_d_old_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], 
-                                                              case_dict["ac_dict"], case_dict["ag_dict"], configs)
-  if flag3: cbxs_res_dict = cbss_d_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], 
+  if flag1: 
+    cbxs_baseline_dict = cbss_tpg_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], 
                                                       case_dict["ac_dict"], case_dict["ag_dict"], configs)
-  print(cbxs_baseline_dict)
-  print(cbxs_old_res_dict)
-  print(cbxs_res_dict)
+    print(cbxs_baseline_dict)
+  if flag2: 
+    cbxs_old_res_dict = cbss_d_old_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], 
+                                                      case_dict["ac_dict"], case_dict["ag_dict"], configs)
+    print(cbxs_old_res_dict)
+  if flag3: 
+    cbxs_res_dict = cbss_d_mcpfd.RunCbssMCPFD(grids, case_dict["starts"], case_dict["goals"], case_dict["finals"], 
+                                                      case_dict["ac_dict"], case_dict["ag_dict"], configs)
+    print(cbxs_res_dict)
 
   ### simulate the path-sets of CBXS
   if sim:
@@ -251,6 +286,20 @@ def RunExp(exp_name, case, map, problem, N_list, M_list, duration_list, sim, fla
                             N = n, M = m, idx = i, duration = dur, exp_name = exp, sim=sim, flag1=flag1, flag2=flag2, flag3=flag3)
           i += 1
 
+def RunSingleExp(exp_name, case, map, problem, N, M, duration, idx, sim, flag1=True, flag2=True, flag3=True):
+  exp = exp_name+'/'+problem
+  if problem == 'msmp':
+    cbxs_baseline_dict, cbxs_old_res_dict, cbxs_res_dict = run_CBSS_MSMP(case,
+                    os.path.join(cur_path, 'data', case, map),
+                    os.path.join(cur_path, 'data', case, "scen-random/"+case+"-random-1.scen"),
+                    N = N, M = M, idx = idx, duration = duration, exp_name = exp, sim=sim, flag1=flag1, flag2=flag2, flag3=flag3)
+  else:
+    cbxs_baseline_dict, cbxs_old_res_dict, cbxs_res_dict = run_CBSS_MCPFD(case,
+                    os.path.join(cur_path, 'data', case, map),
+                    os.path.join(cur_path, 'data', case, "scen-random/"+case+"-random-1.scen"),
+                    N = N, M = M, idx = idx, duration = duration, exp_name = exp, sim=sim, flag1=flag1, flag2=flag2, flag3=flag3)
+  
+
 if __name__ == '__main__':
   print("begin of main")
   # EXPERIMENT:
@@ -262,15 +311,28 @@ if __name__ == '__main__':
   problem1 = 'msmp' 
   problem2 = 'mcpfd'
   sim = False
+  N_list = [10]
   # N_list = [5,10,20]
-  # M_list = [10,20,30,40,50]
-  # duration_list = [2,5,10,20]
-  N_list = [5]
-  M_list = [10]
-  duration_list = [2]
-  RunExp(exp_name, case1_name, map1_name, problem1, N_list, M_list, duration_list, sim, True, True, True)
-  # RunExp(exp_name, case2_name, map2_name, problem1, N_list, M_list, duration_list, sim, True, True, True)
-  # RunExp(exp_name, case1_name, map1_name, problem2, N_list, M_list, duration_list, sim, True, True, True)
-  # RunExp(exp_name, case2_name, map2_name, problem2, N_list, M_list, duration_list, sim, True, True, True)
+  M_list = [10,20,30,40,50]
+  duration_list = [2,5,10,20]
+  # N_list = [20]
+  # M_list = [20]
+  # duration_list = [20]
+  
+  # TODO: run the following experiments
+  ## 1. random map + msmp problem
+  RunExp(exp_name, case1_name, map1_name, problem1, N_list, M_list, duration_list, sim, True, False, True)
+  
+  ## 2. maze map + msmp problem
+  RunExp(exp_name, case2_name, map2_name, problem1, N_list, M_list, duration_list, sim, True, False, True)
+  
+  ## 3. random map + mcpfd problem
+  RunExp(exp_name, case1_name, map1_name, problem2, N_list, M_list, duration_list, sim, True, False, True)
+  
+  ## 4. maze map + mcpfd problem
+  RunExp(exp_name, case2_name, map2_name, problem2, N_list, M_list, duration_list, sim, True, False, True)
 
+  # TODO: run single experiment
+  # RunSingleExp(exp_name, case1_name, map1_name, problem1, 10, 10, 20, 3, sim, False, False, True)
+  
   print("end of main")
