@@ -617,7 +617,7 @@ class CbssDFramework:
     reached_goal_id = -1
     while True:
       tnow = time.perf_counter()
-      rd = len(self.closed_set)
+      # rd = len(self.closed_set)
       # print("tnow - self.tstart = ", tnow - self.tstart, " tlimit = ", self.time_limit)
       if (tnow - self.tstart > self.time_limit):
         print(" FAIL! timeout! ")
@@ -699,13 +699,18 @@ class CbssDFramework:
       # print(">>>>>>>>>>>>>>>>>>>> end of an iteration")
     # end of while
 
+    target_timeline = {}
+    path_set = dict()
+    # print("############ cstrs[0]: \n", self.cstr_set[0])
+    if search_success:
+      print(" SUCCESS! search succeed! ")
+      path_set = self.ReconstructPath(reached_goal_id)
+      target_timeline = self.target_timeline[reached_goal_id]
+    else:
+      print(" FAIL! search failed! ")
     output_res = [ int(len(self.closed_set)), float(best_g_value), int(0), int(self.open_list.size()), \
       int(self.num_closed_low_level_states), int(search_success), float(time.perf_counter()-self.tstart),\
       int(self.kbtsp.GetTotalCalls()), float(self.kbtsp.GetTotalTime()), int(len(self.root_set)),\
-      int(len(self.conflict_set)),int(len(self.sp_conflict)),self.kbtsp.init_graph_time, self.target_timeline[reached_goal_id]]
-    # print("############ cstrs[0]: \n", self.cstr_set[0])
-    if search_success:
-      return self.ReconstructPath(reached_goal_id), output_res, self.conflict_set, self.sp_conflict
-    else:
-      return dict(), output_res, self.conflict_set, self.sp_conflict
+      int(len(self.conflict_set)),int(len(self.sp_conflict)),self.kbtsp.init_graph_time, target_timeline]
+    return path_set, output_res, self.conflict_set, self.sp_conflict
     

@@ -671,7 +671,7 @@ class CbssTPGFramework:
     reached_goal_id = -1
     while True:
       tnow = time.perf_counter()
-      rd = len(self.closed_set)
+      # rd = len(self.closed_set)
       # print("tnow - self.tstart = ", tnow - self.tstart, " tlimit = ", self.time_limit)
       if (tnow - self.tstart > self.time_limit):
         print(" FAIL! timeout! ")
@@ -756,17 +756,20 @@ class CbssTPGFramework:
       # print(">>>>>>>>>>>>>>>>>>>> end of an iteration")
     # end of while
 
-    output_res = [ int(len(self.closed_set)), float(best_g_value), int(0), int(self.open_list.size()), \
-      int(self.num_closed_low_level_states), int(search_success), float(time.perf_counter()-self.tstart),\
-      int(self.kbtsp.GetTotalCalls()), float(self.kbtsp.GetTotalTime()), int(len(self.root_set)),\
-      int(len(self.conflict_set)),int(len(self.sp_conflict)),self.kbtsp.init_graph_time, self.target_timeline[reached_goal_id]]
-    # print("############ cstrs[0]: \n", self.cstr_set[0])
+    target_timeline = {}
     if search_success:
       print("#### search path is: ", self.nodes[reached_goal_id].sol.paths)
       print("compute cost is: ")
       self.nodes[reached_goal_id].ComputeCost(True)
       self.path_set = self.ReconstructPath(reached_goal_id)
-      return self.path_set, output_res, self.conflict_set, self.sp_conflict
+      target_timeline = self.target_timeline[reached_goal_id]
     else:
-      return self.path_set, output_res, self.conflict_set, self.sp_conflict
+      print("#### search failed!")
+    
+    output_res = [ int(len(self.closed_set)), float(best_g_value), int(0), int(self.open_list.size()), \
+      int(self.num_closed_low_level_states), int(search_success), float(time.perf_counter()-self.tstart),\
+      int(self.kbtsp.GetTotalCalls()), float(self.kbtsp.GetTotalTime()), int(len(self.root_set)),\
+      int(len(self.conflict_set)),int(len(self.sp_conflict)),self.kbtsp.init_graph_time, target_timeline]
+      
+    return self.path_set, output_res, self.conflict_set, self.sp_conflict
     
