@@ -26,17 +26,17 @@ Deploy CBSS-D as the planner and TPG as the scheduler in Gazebo and Rviz:
 * [LKH-2.10.0](http://webhotel4.ruc.dk/~keld/research/LKH/) is required as the underlying TSP solver. The executable of LKH should be placed at location: pytspbridge/tsp_solver/LKH-2.10.0/LKH. In other words, run `pytspbridge/tsp_solver/LKH-2.10.0/LKH` command in the terminal should be able to invoke LKH.
 
 ## Instructions
-* For example, run:
+* For a simple example, run:
   ```python
   python3 run_example.py
   ```
 
-* For large-scale benchmark, run:
+* For the large-scale benchmark, run:
   ```python
   python3 run_cbss_mcpfd.py
   ```
   
-  It may take a long time to finish running all the scens in the [dataset](https://movingai.com/benchmarks/mapf.html). You can adjust the params `N_list`, `M_list` and `duration_list` to decrease the workload.
+  It may take a long time to finish running all the scens in the [benchmark](https://movingai.com/benchmarks/mapf.html). You can adjust the params `N_list`, `M_list` and `duration_list` to decrease the workload.
 
 ## Notes
 Under `libmcpfd`, the code structure is as follows:
