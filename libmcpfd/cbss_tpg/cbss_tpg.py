@@ -512,7 +512,7 @@ class CbssTPGFramework:
     
     if len(res_path) == 0:  # failed
       success = False
-      return [], [], success
+      return [], [], [], success
     else:  # good
       self.UpdateStats(sipp_stats)
       # Concatenate the path

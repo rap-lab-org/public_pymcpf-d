@@ -528,7 +528,7 @@ class CbssDFramework:
           print("satisfy constraints")
         else:
           print(" no satisfy constraints")
-          return [], [], False
+          return [], [], [], False
     
     if len(res_path) == 0:  # failed
       success = False
